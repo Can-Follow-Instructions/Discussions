@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class Discussion {
@@ -6,7 +6,7 @@ export class Discussion {
   id: number;
 
   @Column()
-  commentId: number;
+  parentId: number;
 
   @Column()
   content: string;

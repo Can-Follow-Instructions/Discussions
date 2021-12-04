@@ -39,7 +39,7 @@ export class DiscussionsService {
     });
 
     tmpResult.forEach(function (item) {
-      const parent = nodes[item.commentId];
+      const parent = nodes[item.parentId];
       parent.replies.push(item);
     });
 

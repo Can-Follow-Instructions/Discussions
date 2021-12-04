@@ -16,6 +16,7 @@ import { DiscussionsModule } from './discussions/discussions.module';
       database: process.env.DATABASE_NAME || 'discussion',
       entities: [Discussion],
       synchronize: true, // only for dev
+      logging: true,
     }),
     DiscussionsModule,
   ],

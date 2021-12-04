@@ -3,7 +3,7 @@ import { CreateDateColumn } from 'typeorm';
 
 export class CreateDiscussionDto {
   @ApiProperty()
-  commentId: number;
+  parentId: number;
 
   @ApiProperty()
   content: string;
