@@ -13,9 +13,7 @@ export class DiscussionsService {
   ) {}
 
   create(createDiscussionDto: CreateDiscussionDto) {
-    return this.discussionRepository.save(
-      this.discussionRepository.create(createDiscussionDto),
-    );
+    return this.discussionRepository.save(this.discussionRepository.create(createDiscussionDto));
   }
 
   findAll() {
@@ -28,25 +26,24 @@ export class DiscussionsService {
 
   async findByPostId(id: number) {
     const query = this.discussionRepository.createQueryBuilder('discussion');
-    query.where('discussion.postId = :postId', {postId: id })
-    let tmpResult = await query.getMany();
-    let nodes = {};
+    query.where('discussion.postId = :postId', { postId: id });
+    const tmpResult = await query.getMany();
+    const nodes = {};
     nodes[0] = {
-      replies: []
+      replies: [],
     };
 
-    tmpResult.forEach(function(item) {
+    tmpResult.forEach(function (item) {
       nodes[item.id] = item;
       item.replies = [];
     });
 
-    tmpResult.forEach(function(item) {
-      let parent = nodes[item.commentId];
+    tmpResult.forEach(function (item) {
+      const parent = nodes[item.commentId];
       parent.replies.push(item);
     });
 
     return nodes[0].replies;
-
   }
 
   update(id: number, updateDiscussionDto: UpdateDiscussionDto) {
