@@ -1,5 +1,4 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { CreateDateColumn } from 'typeorm';
 
 export class CreateDiscussionDto {
   @ApiProperty()
@@ -7,9 +6,6 @@ export class CreateDiscussionDto {
 
   @ApiProperty()
   content: string;
-
-  @CreateDateColumn()
-  createTime: Date;
 
   @ApiProperty()
   userId: number;

@@ -1,7 +1,6 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { DiscussionsService } from './discussions.service';
 import { CreateDiscussionDto } from './dto/create-discussion.dto';
-import { UpdateDiscussionDto } from './dto/update-discussion.dto';
 
 @Controller('discussions')
 export class DiscussionsController {
@@ -17,23 +16,8 @@ export class DiscussionsController {
     return this.discussionsService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.discussionsService.findOne(+id);
-  }
-
   @Get('/post/:id')
   findByPostId(@Param('id') id: string) {
     return this.discussionsService.findByPostId(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateDiscussionDto: UpdateDiscussionDto) {
-    return this.discussionsService.update(+id, updateDiscussionDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.discussionsService.remove(+id);
   }
 }

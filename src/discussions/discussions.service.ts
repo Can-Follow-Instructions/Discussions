@@ -1,56 +1,60 @@
 import { Injectable } from '@nestjs/common';
 import { CreateDiscussionDto } from './dto/create-discussion.dto';
-import { UpdateDiscussionDto } from './dto/update-discussion.dto';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Discussion } from './entities/discussion.entity';
+import * as AWS from 'aws-sdk';
 
 @Injectable()
 export class DiscussionsService {
-  constructor(
-    @InjectRepository(Discussion)
-    private discussionRepository: Repository<Discussion>,
-  ) {}
-
-  create(createDiscussionDto: CreateDiscussionDto) {
-    return this.discussionRepository.save(this.discussionRepository.create(createDiscussionDto));
+  private db: AWS.DynamoDB.DocumentClient;
+  constructor() {
+    AWS.config.update({ region: 'us-east-1' });
+    this.db = new AWS.DynamoDB.DocumentClient();
   }
 
-  findAll() {
-    return this.discussionRepository.find();
+  async create(createDiscussionDto: CreateDiscussionDto) {
+    const discussion = {
+      ...createDiscussionDto,
+      createdAt: new Date().toISOString(),
+    };
+    this.db
+      .put({
+        TableName: 'discussion',
+        Item: discussion,
+      })
+      .promise();
   }
 
-  findOne(id: number) {
-    return this.discussionRepository.findOne(id);
+  async findAll() {
+    const resp = await this.db.scan({ TableName: 'discussion' }).promise();
+    return resp.Items;
   }
 
-  async findByPostId(id: number) {
-    const query = this.discussionRepository.createQueryBuilder('discussion');
-    query.where('discussion.postId = :postId', { postId: id });
-    const tmpResult = await query.getMany();
+  async findByPostId(postId: number) {
+    const discussions = await this.db
+      .query({
+        TableName: 'discussion',
+        KeyConditionExpression: 'postId = :postId',
+        ExpressionAttributeValues: {
+          ':postId': postId,
+        },
+      })
+      .promise();
+
     const nodes = {};
+
     nodes[0] = {
       replies: [],
     };
 
-    tmpResult.forEach(function (item) {
+    discussions.Items.forEach((item) => {
       nodes[item.id] = item;
       item.replies = [];
     });
 
-    tmpResult.forEach(function (item) {
+    discussions.Items.forEach((item) => {
       const parent = nodes[item.parentId];
       parent.replies.push(item);
     });
 
     return nodes[0].replies;
-  }
-
-  update(id: number, updateDiscussionDto: UpdateDiscussionDto) {
-    return this.discussionRepository.update(id, updateDiscussionDto);
-  }
-
-  remove(id: number) {
-    return this.discussionRepository.delete(id);
   }
 }
