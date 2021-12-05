@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { CreateDiscussionDto } from './dto/create-discussion.dto';
 import * as AWS from 'aws-sdk';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class DiscussionsService {
@@ -13,6 +14,7 @@ export class DiscussionsService {
   async create(createDiscussionDto: CreateDiscussionDto) {
     const discussion = {
       ...createDiscussionDto,
+      id: randomUUID(),
       createdAt: new Date().toISOString(),
     };
     this.db
@@ -32,6 +34,7 @@ export class DiscussionsService {
     const discussions = await this.db
       .query({
         TableName: 'discussion',
+        IndexName: 'postId-createdAt-index',
         KeyConditionExpression: 'postId = :postId',
         ExpressionAttributeValues: {
           ':postId': postId,
@@ -41,7 +44,7 @@ export class DiscussionsService {
 
     const nodes = {};
 
-    nodes[0] = {
+    nodes[''] = {
       replies: [],
     };
 
@@ -55,6 +58,6 @@ export class DiscussionsService {
       parent.replies.push(item);
     });
 
-    return nodes[0].replies;
+    return nodes[''].replies;
   }
 }

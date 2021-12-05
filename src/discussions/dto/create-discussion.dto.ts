@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateDiscussionDto {
   @ApiProperty()
-  parentId: number;
+  parentId: string;
 
   @ApiProperty()
   content: string;
