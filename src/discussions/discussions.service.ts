@@ -15,9 +15,9 @@ export class DiscussionsService {
     const discussion = {
       ...createDiscussionDto,
       id: randomUUID(),
-      createdAt: new Date().toISOString(),
+      createTime: new Date().toISOString(),
     };
-    this.db
+    return this.db
       .put({
         TableName: 'discussion',
         Item: discussion,
@@ -34,13 +34,15 @@ export class DiscussionsService {
     const discussions = await this.db
       .query({
         TableName: 'discussion',
-        IndexName: 'postId-createdAt-index',
+        IndexName: 'postId-createTime-index',
         KeyConditionExpression: 'postId = :postId',
         ExpressionAttributeValues: {
           ':postId': postId,
         },
       })
       .promise();
+
+    console.log(discussions);
 
     const nodes = {};
 
